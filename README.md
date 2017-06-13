@@ -40,15 +40,15 @@ install.packages(packages, dependencies = TRUE)
 
 | Part | Subject                               |        |           |
 | ---- | ------------------------------------- | ------ | --------- |
-|    1 | R Essentials & Data Management        | [code](/data-management.Rmd) | [HTML output](https://htmlpreview.github.io/?https://github.com/wesslen/r-bootcamp-workshop-summer-2017/master/data-management.html)   |
+|    1 | R Essentials & Data Management        | [code](/data-management.Rmd) | [HTML output](https://htmlpreview.github.io/?https://rawgit.com/wesslen/r-bootcamp-workshop-summer-2017/master/data-management.html)   |
 |   2a | Visualizations: ggplot2 introduction  | [code](/ggplot2-introduction.Rmd) | [HTML output](https://rawgit.com/wesslen/r-bootcamp-workshop-summer-2017/master/ggplot2-introduction.html)   |
 
 ## Day 2: June 16
 
 | Part | Subject                                |        |           |
 | ---- | -------------------------------------  | ------ | --------- |
-|   2b | Visualizations: Interactive plots      | [code](/interactive-plots.Rmd) | [HTML output](https://htmlpreview.github.io/?https://github.com/wesslen/r-bootcamp-workshop-summer-2017/master/interactive-plots.html)   |
-|    3 | Regression Modeling                    | [code](/regression-modeling.Rmd) | [HTML output](https://rawgit.com/wesslen/r-bootcamp-workshop-summer-2017/master/regression-modeling.html)   |
+|   2b | Visualizations: Interactive plots      | [code](/interactive-plots.Rmd) | [HTML output](https://rawgit.com/wesslen/r-bootcamp-workshop-summer-2017/master/interactive-plots.html)   |
+|    3 | Regression Modeling                    | [code](/regression-modeling.Rmd) | [HTML output](https://htmlpreview.github.io/?https://rawgit.com/wesslen/r-bootcamp-workshop-summer-2017/master/regression-modeling.html)   |
 
 ## Helpful Links
 
