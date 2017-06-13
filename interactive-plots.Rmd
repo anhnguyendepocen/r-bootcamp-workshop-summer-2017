@@ -1,0 +1,210 @@
+---
+title: "R Bootcamp: Interactive Visualizations"
+author: "Ryan Wesslen"
+date: "June 16, 2017"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE)
+```
+
+## Load dataset
+
+Let's read in our dataset.
+
+```{r data}
+library(tidyverse)
+
+d <- read_csv("./Data/data.csv")
+```
+
+## Review Practice Problems
+
+1.  Create a box plot with the x-axis as year.
+
+First, let's try the obvious plot, using `x = year`, `y = MOR`, and adding `geom_boxplot()`.
+
+However, running this we get a weird result: why?
+
+```{r}
+ggplot(d, aes(x = year, y = MOR)) +
+  geom_boxplot()
+```
+
+This is a formatting issue because our dataset has year as an integer, not a category.
+
+What's an easy way to remediate this problem? Transforming year to a factor.
+
+```{r}
+ggplot(d, aes(x = as.factor(year), y = MOR)) +
+  geom_boxplot()
+```
+
+2.  Next, use a `facet` layer to trellis the box plots by region so that each region has its own temporal box plots. Then create a new plot with only Sub-Saharan Africa and South Asia.
+
+For the next part, we can `facet` to create a plot for each region.
+
+```{r}
+ggplot(d, aes(x = as.factor(year), y = MOR, color = region)) +
+  geom_boxplot() + facet_wrap(~region)
+```
+
+The chart is still too busy. Perhaps we want to look at only Sub-Saharan Africa and South Asia.
+
+```{r}
+reg <- c("Sub-Saharan Africa", "South Asia")
+
+ggplot(d[d$region %in% reg,], aes(x = as.factor(year), y = MOR, color = region)) +
+  geom_boxplot()
+```
+
+3.  Clean up the plot with Sub-Saharan Africa & South Asia by adding x, y, and title labels; moving the legend to the bottom; and color each region by a unique color.
+
+```{r}
+ggplot(d[d$region %in% reg,], aes(x = as.factor(year), y = MOR, fill = region)) +
+  geom_boxplot() + 
+  theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom") +
+  labs(x = "Year", y = "Mortality Rate Distribution", title = "Sub-Saharan Africa & South Asia: Mortality Rates") +
+  scale_color_discrete(guide = guide_legend(title = "Region"))
+```
+
+## themes and ggthemes
+
+Themes can also be helpful to modify the overall style of a plot.
+
+There are helpful add-ins within the `ggthemes` package, which can provide a broader range of templates.
+
+For example: [Tufte](https://www.edwardtufte.com/tufte/) Box Plots ("Minimum Ink")
+
+First, let's rerun the data manipulations we did yesterday...
+
+```{r}
+pop2014 <- d[d$year==2014,]
+pop2014$region <- factor(pop2014$region, 
+                         levels = c("Sub-Saharan Africa",
+                                    "South Asia",
+                                    "East Asia & Pacific",
+                                    "Latin America & Caribbean",
+                                    "Middle East & North Africa",
+                                    "Europe & Central Asia",
+                                    "North America"
+                                    ))
+
+levels(pop2014$region) <- gsub("&", "\n &", levels(pop2014$region))
+```
+
+Now, let's create the plot (after calling `ggthemes`)...
+
+```{r}
+#install.packages("ggthemes")
+library(ggthemes)
+
+g <- ggplot(pop2014, aes(region, MOR)) + labs(x = "Region", y = "Mortality Rate") 
+g 
+```
+
+change the theme...
+
+```{r}
+g + theme_tufte(ticks=FALSE)
+```
+
+then add the geom...
+
+```{r}
+g + theme_tufte(ticks=FALSE) +
+  geom_tufteboxplot()
+```
+
+or modify it...
+
+```{r}
+g + theme_tufte(ticks=FALSE) +
+  geom_tufteboxplot(median.type = "line", whisker.type = 'line')
+```
+
+```{r}
+g + theme_tufte(ticks=TRUE) +
+  geom_tufteboxplot(median.type = "line", whisker.type = 'line', hoffset = 0, width = 2)
+```
+
+There are many other themes like...
+
+```{r}
+#recall from yesterday's code
+years <- c(2001, 2005, 2009, 2013)
+d1 <- d[d$year %in% years,]
+
+p <- ggplot(d1, aes(x = HEX, y = MOR, color = region)) +
+  geom_point() +
+  facet_wrap(~year) + 
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "Health Expenditure as a Percent of GDP (Log)", y = "Mortality Rate (Log)") +
+  geom_smooth(method=lm, se=FALSE)  # Don't add shaded confidence region
+
+p + theme_solarized() +
+  scale_colour_solarized("blue") +
+  scale_color_discrete(guide = guide_legend(title = "Region"))
+```
+
+```{r}
+p + theme_igray()
+```
+
+```{r}
+p + theme_few() + 
+  scale_colour_few() + 
+  scale_color_discrete(guide = guide_legend(title = "Region"))
+```
+
+Here's a full list: [https://github.com/jrnold/ggthemes](https://github.com/jrnold/ggthemes)
+
+## ggplot2 for plotly
+
+Plotly is a package of interactive visualizations.
+
+In fact, they have a `ggplot2` package called [`plotly`](https://plot.ly/ggplot2/) that is a wrapper function `ggplotly` on `ggplot2` but for interactive visualizations.
+
+There are multiple ways to run interactive `ggplot`, but the easiest is to use the same logic for `ggplot` but then pass the object to the function `ggplotly()`.
+
+
+```{r}
+#install.packages("plotly")
+library(plotly)
+
+ggplotly(p)
+```
+
+```{r}
+#rerun data manipulations from yesterday
+d$r.MOR <- d$MOR * (d$POP) / 1000
+d2 <- d %>% 
+  na.omit() %>% # note the na.omit is very important!
+  group_by(region, year) %>% 
+  summarise(t.MOR=sum(r.MOR),
+            t.POP=sum(POP)) %>%
+  mutate(MOR.rate = t.MOR / (t.POP / 1000))
+
+p <- ggplot(d2, aes(year, MOR.rate, color = region)) + 
+  geom_line() +
+  geom_point() + 
+  labs(x = "Year", y = "Mortality Rate") +
+  scale_color_discrete(guide = guide_legend(title = "Region"))
+
+ggplotly(p)
+```
+
+## Web-interactive Visualizations
+
+What's the range of possible ggplot2 options?
+
+There's a great open source Shiny app to explore ggplot2: [https://www.r-bloggers.com/shiny-app-to-explore-ggplot2/](https://www.r-bloggers.com/shiny-app-to-explore-ggplot2/)
+
+This visualization utilizes [Shiny](https://shiny.rstudio.com/), which is a R visualization toolkit to build interactive visualizations without knowing JavaScript, HTML, and CSS.
+
+I've previously created a [R Visualization Tutorial](https://github.com/wesslen/RVisTutorial) that includes several examples using Twitter data.
