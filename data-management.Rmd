@@ -93,6 +93,8 @@ knitr::opts_knit$set(root.dir = "C:/Users/pjung1/Dropbox (UNC Charlotte)/R Bootc
 # Import csv file
 d.POP <- read.csv("C:/Users/pjung1/Dropbox (UNC Charlotte)/R Bootcamp/Data/WB_pop_total.csv")
 
+setwd("C:/RBootcamp/r-bootcamp-workshop-summer-2017-master")
+
 # read_dta: "haven" function to load STATA dta file
 
 library("haven")
